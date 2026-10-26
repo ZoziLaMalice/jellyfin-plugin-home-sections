@@ -94,6 +94,7 @@ The sections that are new for this plugin (and most likely the reason you would 
 
 ### Prerequisites
 - This plugin is based on at least Jellyfin Version `10.10.7`, with 10.11.x also officially supported.
+- **Fork note:** this branch (`jellyfin-12.3`) builds against Jellyfin `12.3.0` by default. To target another 12.x version, build with `dotnet build -p:JellyfinVersion=12.x.0`.
 - The following plugins are required to also be installed, please following their installation guides, always install the latest versions for the most stable experience:
   - File Transformation (https://github.com/IAmParadox27/jellyfin-plugin-file-transformation)
   - Plugin Pages (https://github.com/IAmParadox27/jellyfin-plugin-pages)
