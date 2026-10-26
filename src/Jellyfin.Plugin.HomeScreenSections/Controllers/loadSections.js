@@ -392,9 +392,18 @@
     function isUserUsingHomeScreenSections(pluginMeta, _userSettings) {
         try {
             if (pluginMeta && pluginMeta.AllowUserOverride === true) {
-                var data = _userSettings && _userSettings.getData && _userSettings.getData();
-                if (data && data.CustomPrefs && data.CustomPrefs.useModularHome !== undefined) {
-                    return data.CustomPrefs.useModularHome === "true";
+                var userChoice;
+                // jellyfin-web's UserSettings exposes get(), not getData(): read the
+                // per-user preference through get() and keep getData() as a fallback.
+                if (_userSettings && typeof _userSettings.get === "function") {
+                    userChoice = _userSettings.get("useModularHome");
+                }
+                if (userChoice === undefined || userChoice === null) {
+                    var data = _userSettings && _userSettings.getData && _userSettings.getData();
+                    userChoice = data && data.CustomPrefs ? data.CustomPrefs.useModularHome : undefined;
+                }
+                if (userChoice !== undefined && userChoice !== null) {
+                    return String(userChoice) === "true";
                 }
             }
             return !!(pluginMeta && pluginMeta.Enabled);
