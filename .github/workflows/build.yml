@@ -36,6 +36,25 @@ jobs:
           mkdir -p dist/HomeScreenSections
           cp out/Jellyfin.Plugin.HomeScreenSections.dll dist/HomeScreenSections/
           cp src/logo.png dist/HomeScreenSections/ 2>/dev/null || true
+          VERSION=$(sed -n 's#.*<Version>\(.*\)</Version>.*#\1#p' "$PROJECT" | head -1)
+          cat > dist/HomeScreenSections/meta.json <<EOF
+          {
+            "category": "General",
+            "changelog": "Built from ${GITHUB_SHA}",
+            "description": "Modular home screen sections (fork built for Jellyfin 12.3)",
+            "guid": "b8298e01-2697-407a-b44d-aa8dc795e850",
+            "name": "Home Screen Sections",
+            "overview": "Home Screen Sections for Jellyfin $JELLYFIN_VERSION",
+            "owner": "ZoziLaMalice",
+            "targetAbi": "$JELLYFIN_VERSION.0",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "version": "$VERSION",
+            "status": "Active",
+            "autoUpdate": false,
+            "imagePath": "",
+            "assemblies": ["Jellyfin.Plugin.HomeScreenSections.dll"]
+          }
+          EOF
           cd dist && zip -r "../HomeScreenSections-jf$JELLYFIN_VERSION.zip" HomeScreenSections
 
       - uses: actions/upload-artifact@v4
