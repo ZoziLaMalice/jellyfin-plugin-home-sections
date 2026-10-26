@@ -1,10 +1,23 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Jellyfin.Plugin.HomeScreenSections.Library;
 
 namespace Jellyfin.Plugin.HomeScreenSections.Data
 {
     public class UserSectionsDataCache
     {
+        private static int s_generation;
+
+        /// <summary>
+        /// Gets the current cache generation. Cached section layouts built under an older generation are stale.
+        /// </summary>
+        public static int CurrentGeneration => Volatile.Read(ref s_generation);
+
+        /// <summary>
+        /// Marks every cached section layout as stale, so the next home screen request rebuilds it
+        /// from the current plugin configuration and user settings.
+        /// </summary>
+        public static void InvalidateAll() => Interlocked.Increment(ref s_generation);
+
         // The GUID here represents the page hash
         public ConcurrentDictionary<Guid, UserSectionsData> Cache { get; set; } = new ConcurrentDictionary<Guid, UserSectionsData>();
         
@@ -16,6 +29,8 @@ namespace Jellyfin.Plugin.HomeScreenSections.Data
     public class UserSectionsData
     {
         public DateTime? LastAccessed { get; set; } = null;
+
+        public int Generation { get; init; } = UserSectionsDataCache.CurrentGeneration;
         
         public required Guid UserId { get; set; }
         

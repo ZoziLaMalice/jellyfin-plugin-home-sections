@@ -315,6 +315,7 @@ namespace Jellyfin.Plugin.HomeScreenSections.Services
             Guid[] activePageHashes = m_dataCache.PageHashExpiry
                 .Where(x => userPageHashes.Any(y => y == x.Key))
                 .Where(x => x.Value > DateTime.UtcNow)
+                .Where(x => m_dataCache.Cache.ContainsKey(x.Key) && !IsStale(x.Key))
                 .OrderByDescending(x => x.Value)
                 .Select(x => x.Key)
                 .ToArray();
@@ -329,7 +330,14 @@ namespace Jellyfin.Plugin.HomeScreenSections.Services
         
         private bool DoesPageBelongToUser(Guid pageHash, Guid userId)
         {
-            return m_dataCache.PageHashOwnerIds.TryGetValue(pageHash, out Guid ownerId) && ownerId == userId;
+            return m_dataCache.PageHashOwnerIds.TryGetValue(pageHash, out Guid ownerId) && ownerId == userId
+                && !IsStale(pageHash);
+        }
+
+        private bool IsStale(Guid pageHash)
+        {
+            return m_dataCache.Cache.TryGetValue(pageHash, out UserSectionsData? data)
+                && data.Generation != UserSectionsDataCache.CurrentGeneration;
         }
     }
 

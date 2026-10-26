@@ -241,6 +241,9 @@ namespace Jellyfin.Plugin.HomeScreenSections.HomeScreen
         /// <inheritdoc/>
         public bool UpdateUserSettings(Guid userId, ModularHomeUserSettings userSettings)
         {
+            // The user's enabled sections are changing: drop cached home screen layouts.
+            Data.UserSectionsDataCache.InvalidateAll();
+
             m_logger.LogInformation($"Updating user settings for user {userId}");
             m_logger.LogInformation($"Json of user settings received from browser: {JsonConvert.SerializeObject(userSettings)}");
             

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.Loader;
 using Jellyfin.Plugin.HomeScreenSections.Configuration;
 using Jellyfin.Plugin.HomeScreenSections.Library;
@@ -98,6 +98,9 @@ namespace Jellyfin.Plugin.HomeScreenSections
             }
 
             base.UpdateConfiguration(configuration);
+
+            // Section order and enabled state may have changed: drop cached home screen layouts.
+            Data.UserSectionsDataCache.InvalidateAll();
         }
 
         /// <summary>
